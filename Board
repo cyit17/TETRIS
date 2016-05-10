@@ -1,0 +1,43 @@
+import javax.swing.JFrame;
+import java.awt.Graphics;
+import javax.swing.JPanel;
+import java.awt.Color;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import java.awt.BorderLayout; 
+
+public class Board {
+	private static final int DEFAULT_ROWS = 15;
+	private static final int DEFAULT_COLS = 10;
+	
+	public Color[][] b;
+	
+	public Board(int r, int c)
+	{
+		this.board = new Color[r][c];
+	}
+	
+	public Board()
+	{
+		this(DEFAULT_ROWS, DEFAULT_COLS);
+	}
+/** 
+	public Color getColor(int r, int c)
+	{
+		return board[r][c];
+	}
+	
+	public void setColor(Color color, int r, int c)
+	{
+		board[r][c] = color;
+	}
+**/
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		b[0][0] = Color.red;
+		b[0][cols - 1] = Color.white;
+	}
+
+}
