@@ -1,0 +1,25 @@
+//import javax.swing.JFrame;
+//import javax.swing.JLabel;
+//import javax.swing.ImageIcon;
+//import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.Graphics;
+import java.awt.Color;
+import java.awt.BorderLayout; 
+
+public class Tetris extends JPanel {
+	//responsible for display, main controller??
+	//implements (LISTERNER????)
+	
+	
+	public static void main(String[] args)
+	{
+		JFrame frame = new JFrame("demo");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JPanel emptyLabel = new JPanel();
+		frame.getContentPane().add(emptyLabel, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);	
+	}
+	
+}
