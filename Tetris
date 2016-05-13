@@ -7,6 +7,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout; 
+import java.util.Random;
 
 public class Tetris3 extends JPanel
 {
@@ -14,11 +15,16 @@ public class Tetris3 extends JPanel
 	//implements (LISTENER????)
 	public static final int DEFAULT_ROWS = 15;
 	public static final int DEFAULT_COLS = 10;
-	public int rows;
-	public int cols;
-	public Color[][] board;
-	public JFrame frame;
-	public JPanel panel;
+	private int rows;
+	private int cols;
+	private Color[][] board;
+	private JFrame frame;
+	private JPanel panel;
+	private boolean[][] fallingPiece;
+	private Color fallingPieceColor;
+	private int fallingPieceRow;
+	private int fallingPieceCol;
+	
 	
 	  //Seven "standard" pieces (tetrominoes)
 	  private static final boolean[][] I_PIECE = {
@@ -140,10 +146,20 @@ public class Tetris3 extends JPanel
 	}
 	
 	// 1. choose random new piece (rand index from tetrisPiece array)
-	// 2. set instance variables fallingPiece and fallingPiece Color
+	// 2. set instance variables fallingPiece and fallingPieceColor
 	// 3. set fallingPieceRow to zero (top of board)
 	// 4. set fallingPieceCol to cols/2 - this.fallingPieceCols/2 (middle of board, shift to left to compensate for length of piece)
 	public void newFallingPiece()
+	{
+		Random rg = new Random();
+		int random = rg.nextInt(TETRIS_PIECES.length);
+		fallingPiece = TETRIS_PIECES[random];
+		fallingPieceColor = TETRIS_PIECE_COLORS[random];
+		fallingPieceRow = 0;
+		fallingPieceCol = cols/2 - fallingPiece[0].length/2;
+	}
+	
+	public void paintFallingPiece()
 	{
 		
 	}
