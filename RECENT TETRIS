@@ -1,0 +1,208 @@
+import javax.swing.*;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.BorderLayout; 
+import java.util.Random;
+
+public class Tetris3 extends JPanel
+{
+	//responsible for display, main controller??
+	//implements (LISTENER????)
+	public static final int DEFAULT_ROWS = 15;
+	public static final int DEFAULT_COLS = 10;
+	private int rows;
+	private int cols;
+	private Color[][] board;
+	private JFrame frame;
+	private JPanel panel;
+	private boolean[][] fallingPiece;
+	private Color fallingPieceColor;
+	private int fallingPieceRow;
+	private int fallingPieceCol;
+	
+	
+	  //Seven "standard" pieces (tetrominoes)
+	  private static final boolean[][] I_PIECE = {
+	    { true,  true,  true,  true}
+	  };
+	  
+	  private static final boolean[][] J_PIECE = {
+	    { true, false, false },
+	    { true, true,  true }
+	  };
+	  
+	  private static final boolean[][] L_PIECE = {
+	    { false, false, true },
+	    { true,  true,  true }
+	  };
+	  
+	  private static final boolean[][] O_PIECE = {
+	    { true, true },
+	    { true, true }
+	  };
+	  
+	  private static final boolean[][] S_PIECE = {
+	    { false, true, true },
+	    { true,  true, false }
+	  };
+	  
+	  private static final boolean[][] T_PIECE = {
+	    { false, true, false },
+	    { true,  true, true }
+	  };
+
+	  private static final boolean[][] Z_PIECE = {
+	    { true,  true, false },
+	    { false, true, true }
+	  };
+	  
+	  private static boolean[][][] TETRIS_PIECES = {
+	     I_PIECE, J_PIECE, L_PIECE, O_PIECE, S_PIECE, T_PIECE, Z_PIECE
+	  };
+	  
+	  private static Color[] TETRIS_PIECE_COLORS = {
+			  Color.red, Color.yellow, Color.magenta, Color.pink,
+			  Color.cyan, Color.green, Color.orange
+	}; 
+			 
+
+	public Tetris3()
+	{
+		setOpaque(true);
+		rows = DEFAULT_ROWS;
+		cols = DEFAULT_COLS;
+		board = new Color[DEFAULT_ROWS][DEFAULT_COLS];
+	}
+	
+	public Tetris3(int r, int c) 
+	{
+		rows = r;
+		cols = c;
+		board = new Color[r][c];
+	}
+	
+	public void setDefaultTileColor(Color c)
+	{
+		for (int i = 0; i < board.length; i++)
+		{
+			for (int j = 0; j < board[0].length; j++)
+			{
+				board[i][j] = c;
+			}
+		}
+	}
+	
+	public void setBackgroundColor(Color c)
+	{
+		//get component that represents contents of graphic user interface,
+		//layer that is used to hold objects = content pane (JPanel panel)
+		frame.getContentPane().setBackground(c);	
+	}
+	
+	
+	public void initializeFramePanelDim(int frameW, int frameL, int panelW, int panelL, int align, int hgap, int vgap)
+	{
+		frame = new JFrame("TETRIS");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(frameW, frameL);
+		
+		panel = new JPanel();
+		panel.setPreferredSize(new Dimension(panelW, panelL));
+		panel.setOpaque(false);
+		
+		Container contentPane = frame.getContentPane();
+		contentPane.setLayout(new FlowLayout(align, hgap, vgap));
+		
+		frame.add(panel);
+	}
+	
+	
+	public void paintBoard(int borderW, int borderL)
+	{
+		GridLayout grid = new GridLayout(rows, cols, borderW, borderL);
+		panel.setLayout(grid);
+		for (int i = 0; i < board.length; i++)
+		{
+			for (int j = 0; j < board[0].length; j++)
+			{
+				JPanel tile = new JPanel();
+				tile.setOpaque(true);
+				tile.setBackground(board[i][j]);
+				panel.add(tile);
+			}
+		}
+		frame.setVisible(true);
+		
+	}
+	
+	public void setManualBorder(int top, int left, int bottom, int right, Color c)
+	{
+		panel.setBorder(BorderFactory.createMatteBorder(top, left, bottom, right, c));
+	}
+	
+	// 1. choose random new piece (rand index from tetrisPiece array)
+	// 2. set instance variables fallingPiece and fallingPieceColor
+	// 3. set fallingPieceRow to zero (top of board)
+	// 4. set fallingPieceCol to cols/2 - this.fallingPieceCols/2 (middle of board, shift to left to compensate for length of piece)
+	public void newFallingPiece()
+	{
+		Random rg = new Random();
+		int random = rg.nextInt(TETRIS_PIECES.length);
+		fallingPiece = TETRIS_PIECES[random];
+		fallingPieceColor = TETRIS_PIECE_COLORS[random];
+		fallingPieceRow = 0;
+		fallingPieceCol = cols/2 - fallingPiece[0].length/2;
+		System.out.println("type of piece:" + fallingPiece);
+		System.out.println("piece color:" + fallingPieceColor);
+	}
+	
+	public void paintFallingPiece()
+	{
+		//board[fallingPieceRow][fallingPieceCol]
+		for (int r = 0; r < fallingPiece.length; r++)
+		{
+			for (int c = 0; c < fallingPiece[0].length; c++)
+			{
+				if (fallingPiece[r][c])
+					paintCell(fallingPieceRow + r, fallingPieceCol + c, fallingPieceColor); 
+			}
+		}
+	}
+	
+	public void printBoardColors()
+	{
+		for (int r = 0; r < rows; r++)
+		{
+			for (int c = 0; c < cols; c++)
+			{
+				System.out.println(board[r][c]);
+			}
+		}	
+	}
+	
+	public void paintCell(int row, int col, Color c)
+	{
+		board[row][col] = c;
+		
+	}
+	
+	public static void main(String[] args)
+	{
+		Tetris3 test = new Tetris3();
+		test.setDefaultTileColor(Color.WHITE);
+		test.initializeFramePanelDim(400, 600, 300, 450, FlowLayout.CENTER, -10, 50);
+		test.setBackgroundColor(Color.BLACK);
+		test.setManualBorder(20, 20, 20, 20, Color.BLUE);
+		//frame.pack();
+		test.newFallingPiece();
+		test.paintFallingPiece();
+		test.paintBoard(3, 3);
+	}
+	
+
+}
