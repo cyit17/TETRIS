@@ -1,0 +1,612 @@
+import javax.swing.*;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.BorderLayout; 
+import java.util.Random;
+import javax.swing.Timer;
+
+public class Tetris3 extends JPanel implements KeyListener, ActionListener
+{
+	//added serial # to remove error, lightbulb over class declaration line?
+	private static final long serialVersionUID = -3006798671524080331L;
+	public static final int DEFAULT_ROWS = 15;
+	public static final int DEFAULT_COLS = 10;
+	public static final Color DEFAULT_TILE_COLOR = Color.WHITE;
+	private int rows;
+	private int cols;
+	private Color[][] board;
+	private Color emptyColor;
+	private int gridBorderW;
+	private int gridBorderL;
+	private JFrame frame;
+	private JPanel panel;
+	private JPanel side;
+	private JPanel[][] tiles;
+	private boolean[][] fallingPiece;
+	private Color fallingPieceColor;
+	private int fallingPieceRow;
+	private int fallingPieceCol;
+	private Timer timer;
+	private int timerDelay;
+	private boolean isGameOver = false;
+	private boolean paused = false;
+	private boolean[][] holdPiece ={{true},{true}};
+	private JLabel hold;
+	private JLabel score;
+	private JButton menu;
+	private JButton pause;
+	
+	  //Seven "standard" pieces (tetrominoes)
+	  private static final boolean[][] I_PIECE = {
+	    { true,  true,  true,  true}
+	  };
+	  
+	  private static final boolean[][] J_PIECE = {
+	    { true, false, false },
+	    { true, true,  true }
+	  };
+	  
+	  private static final boolean[][] L_PIECE = {
+	    { false, false, true },
+	    { true,  true,  true }
+	  };
+	  
+	  private static final boolean[][] O_PIECE = {
+	    { true, true },
+	    { true, true }
+	  };
+	  
+	  private static final boolean[][] S_PIECE = {
+	    { false, true, true },
+	    { true,  true, false }
+	  };
+	  
+	  private static final boolean[][] T_PIECE = {
+	    { false, true, false },
+	    { true,  true, true }
+	  };
+
+	  private static final boolean[][] Z_PIECE = {
+	    { true,  true, false },
+	    { false, true, true }
+	  };
+	  
+	  private static boolean[][][] TETRIS_PIECES = {
+	     I_PIECE, J_PIECE, L_PIECE, O_PIECE, S_PIECE, T_PIECE, Z_PIECE
+	  };
+	  
+	  private static Color[] TETRIS_PIECE_COLORS = {
+			  Color.red, Color.yellow, Color.magenta, Color.pink,
+			  Color.cyan, Color.green, Color.orange
+	}; 
+			 
+
+	public Tetris3()
+	{
+		setOpaque(true);
+		rows = DEFAULT_ROWS;
+		cols = DEFAULT_COLS;
+		board = new Color[DEFAULT_ROWS][DEFAULT_COLS];
+		tiles = new JPanel[DEFAULT_ROWS][DEFAULT_COLS];
+		hold = new JLabel("HOLD (shift)");
+		score = new JLabel("SCORE");
+		menu = new JButton("MENU (m)");
+		pause = new JButton("PAUSE (p)");
+	}
+	
+	public Tetris3(int r, int c) 
+	{
+		setOpaque(true);
+		rows = r;
+		cols = c;
+		board = new Color[r][c];
+		tiles = new JPanel[r][c];
+		hold = new JLabel("HOLD (shift)");
+		score = new JLabel("SCORE");
+		menu = new JButton("MENU (m)");
+		pause = new JButton("PAUSE (p)");
+	}
+	
+	public void setDefaultTileColor(Color c)
+	{
+		for (int i = 0; i < board.length; i++)
+		{
+			for (int j = 0; j < board[0].length; j++)
+			{
+				board[i][j] = c;
+				emptyColor = c;
+			}
+		}
+	}
+	
+	public void setBackgroundColor(Color c)
+	{
+		//get component that represents contents of graphic user interface,
+		//layer that is used to hold objects = content pane (JPanel panel)
+		frame.getContentPane().setBackground(c);	
+	}
+	
+	public void setGridBorder(int borderW, int borderL)
+	{
+		gridBorderW = borderW;
+		gridBorderL = borderL;
+	}
+	
+	public void initializeFramePanelDim(int frameW, int frameL, int panelW, int panelL, int hgap, int vgap)
+	{
+		frame = new JFrame("TETRIS");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(frameW, frameL);
+		
+		panel = new JPanel();
+		panel.setPreferredSize(new Dimension(panelW, panelL));
+		panel.setOpaque(false);
+		
+		Container contentPane = frame.getContentPane();
+		contentPane.setLayout(new FlowLayout(FlowLayout.LEFT, hgap, vgap));
+		
+		frame.add(panel);
+		frame.addKeyListener(this);
+		this.requestFocusInWindow();
+		
+		GridLayout grid = new GridLayout(rows, cols, gridBorderW, gridBorderL);
+		panel.setLayout(grid);
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				tiles[i][j] = new JPanel();
+				tiles[i][j].setBackground(board[i][j]);
+				tiles[i][j].setOpaque(true);
+				panel.add(tiles[i][j]);
+			}
+		}
+		
+		//side = new JPanel();
+		//side.setPreferredSize(new Dimension(panelW, panelL));
+		//side.setLayout(new BoxLayout(side, BoxLayout.Y_AXIS));
+		//side.setOpaque(false);
+		//frame.add(hold);
+		//frame.add(score);
+		//frame.add(menu);
+		//frame.add(pause);
+		
+		frame.setVisible(true);
+	}
+	
+	public void paintBoard()
+	{ 
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				tiles[i][j].setBackground(board[i][j]);
+			}
+		}
+	}
+	
+	public void setManualBorder(int top, int left, int bottom, int right, Color c)
+	{
+		panel.setBorder(BorderFactory.createMatteBorder(top, left, bottom, right, c));
+	}
+	
+	// 1. choose random new piece (rand index from tetrisPiece array)
+	// 2. set instance variables fallingPiece and fallingPieceColor
+	// 3. set fallingPieceRow to zero (top of board)
+	// 4. set fallingPieceCol to cols/2 - this.fallingPieceCols/2 (middle of board, shift to left to compensate for length of piece)
+	public void newFallingPiece()
+	{
+		Random rg = new Random();
+		int random = rg.nextInt(TETRIS_PIECES.length);
+		fallingPiece = TETRIS_PIECES[random];
+		fallingPieceColor = TETRIS_PIECE_COLORS[random];
+		fallingPieceRow = 0;
+		fallingPieceCol = cols/2 - fallingPiece[0].length/2;
+	}
+	
+	public void paintFallingPiece()
+	{
+		for (int r = 0; r < fallingPiece.length; r++)
+		{
+			for (int c = 0; c < fallingPiece[0].length; c++)
+			{
+				if (fallingPiece[r][c])
+				{
+					paintCell(fallingPieceRow + r, fallingPieceCol + c, fallingPieceColor); 
+			
+				}
+			}
+		}
+	}
+	
+	public void paintCell(int row, int col, Color c)
+	{
+		board[row][col] = c;
+		tiles[row][col].setBackground(c);
+	}
+	
+	public void printBoardColors()
+	{
+		for (int r = 0; r < rows; r++)
+		{
+			for (int c = 0; c < cols; c++)
+			{
+				System.out.println(board[r][c]);
+			}
+		}	
+	}
+	
+	//1. modify location of top-left corner of fallingPiece
+	//2. is new location legal? call fallingPieceIsLegal
+	//3. if not, revert instance variables to og values
+	//param d___ means delta, or change
+	public boolean moveFallingPiece(int drow, int dcol)
+	{
+		//paint over og tile position with background tile color
+		Color colorBefore = fallingPieceColor;
+		fallingPieceColor = emptyColor;
+		paintFallingPiece();
+		
+		if (fallingPieceIsLegal(fallingPieceRow + drow, fallingPieceCol + dcol))
+		{
+			fallingPieceRow += drow;
+			fallingPieceCol += dcol;
+			
+			//paint fallingPiece in new position
+			fallingPieceColor = colorBefore;
+			paintFallingPiece();
+			return true;
+		}	
+		
+		//paint fallingPiece in same position
+		fallingPieceColor = colorBefore;
+		paintFallingPiece();
+		return false;
+	}
+	
+	//return false if:
+	//1. off board
+	//2. collides with non-empty cell on board
+	 public boolean fallingPieceIsLegal(int testRow, int testCol)
+	{
+		for (int r = 0; r < fallingPiece.length; r++)
+		{
+			for (int c = 0; c < fallingPiece[0].length; c++)
+			{
+				//only check for blocks from piece NOT EMPTY 
+				if (fallingPiece[r][c])
+				{
+					int x = testRow + r;
+					int y = testCol + c;
+					if (x < 0 || x >= rows)
+						return false;
+					if (y < 0 || y >= cols)
+						return false;
+					if (board[x][y] != emptyColor)
+						return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	// rotate counter-clockwise around center of piece, 90 degrees
+	public void rotateFallingPiece()
+	{
+		//paint over og tile position with background tile color
+		Color colorBefore = fallingPieceColor;
+		fallingPieceColor = emptyColor;
+		paintFallingPiece();
+		
+		//1. store old fallingPiece (2d array of booleans), location, dimensions
+		//in temp variables
+		
+		boolean[][] pieceBefore = fallingPiece;
+		int rowBefore = fallingPieceRow;
+		int colBefore = fallingPieceCol;
+		int pieceWidth = fallingPiece.length;
+		int pieceLength = fallingPiece[0].length;
+		
+		//2. compute new dimensions, by reversing old dimensions
+		boolean[][] rotatedPiece = new boolean[pieceLength][pieceWidth];
+		for (int i = 0; i < pieceWidth; i++)
+		{
+			for (int j = 0; j < pieceLength; j++)
+			{
+				rotatedPiece[pieceLength - j  - 1][i] = fallingPiece[i][j];
+			}
+		}
+		fallingPiece = rotatedPiece;
+		
+		//3. set top-left of piece to new position
+		fallingPieceRow -= ((pieceLength - pieceWidth) / 2);
+		fallingPieceCol -= ((pieceWidth - pieceLength) / 2);	
+		
+		//3. check if move is legal, else return to old values
+		if (!fallingPieceIsLegal(fallingPieceRow, fallingPieceCol))
+		{
+			fallingPieceRow = rowBefore;
+			fallingPieceCol = colBefore;
+			fallingPiece = pieceBefore;
+		}
+		
+		//paint fallingPiece in new position
+		fallingPieceColor = colorBefore;
+		paintFallingPiece();
+		
+	}
+	
+	public void holdFallingPiece()
+	{
+		boolean[][]swapVariable = new boolean[holdPiece.length][holdPiece[0].length];
+		if(holdPiece.length==2&&holdPiece[0].length==1)
+		{
+			holdPiece=fallingPiece;
+			fallingPieceColor = emptyColor;
+			paintFallingPiece();
+			newFallingPiece();
+			paintFallingPiece();
+		}
+		swapVariable=holdPiece;
+		holdPiece=fallingPiece;
+		fallingPieceColor = emptyColor;
+		paintFallingPiece();
+		newFallingPiece();
+		fallingPiece=swapVariable;
+		
+		paintFallingPiece();
+		
+	}
+	 
+	//must override KeyListener interface 
+	public void keyPressed(KeyEvent e)
+	{
+		if (isGameOver == false)
+		{
+			//System.out.println(e.toString());
+			if (e.getKeyCode() == KeyEvent.VK_LEFT)
+				moveFallingPiece(0, -1);
+			if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+				moveFallingPiece(0, 1);
+			if (e.getKeyCode() == KeyEvent.VK_DOWN)
+				moveFallingPiece(1, 0);
+			if (e.getKeyCode() == KeyEvent.VK_UP)
+				rotateFallingPiece();
+			//hard drop
+			if (e.getKeyCode() == ' ')
+			{
+					while (moveFallingPiece(1, 0))
+					{
+							//System.out.println(fallingPieceIsLegal(fallingPieceRow, fallingPieceCol));
+					}
+			}
+			
+			//hold
+			if (e.getKeyCode() == KeyEvent.VK_SHIFT)
+			{
+				holdFallingPiece();
+			}
+			
+			//press p to pause, key code 80
+			if (e.getKeyCode() == 80)
+			{
+				pauseGame();
+			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_R)
+		{
+			timer.stop();
+			resetGame();	
+		}
+		
+	}	
+	
+	//must override KeyListener interface
+	public void keyReleased(KeyEvent e)
+	{
+		
+	}
+	
+	//must override KeyListener interface
+	public void keyTyped(KeyEvent e)
+	{
+		
+	}
+	
+	//gradually increase event handling (every 3, 2, 1, etc..)
+	//have a variable to keep track of # times called
+	//e.g. use % 2 to act on every other event
+	public void actionPerformed(ActionEvent e)
+	{
+		// move the falling piece, one row/second
+		// place and create new piece 
+		// if current piece cannot move down any further
+		
+		if (moveFallingPiece(1,0) == false)
+		{
+			removeFullRows();
+			paintBoard();
+			newFallingPiece();
+			if (fallingPieceRow == 0 && !fallingPieceIsLegal(fallingPieceRow, fallingPieceCol))
+			{	
+				timer.setDelay(1000);
+				gameOver();	
+			}
+			else
+				moveFallingPiece(-1, 0);
+		}
+	}
+	
+	public void timerFired()
+	{
+		timerDelay = 500; // milliseconds
+		timer = new Timer(timerDelay, (ActionListener)this);
+		timer.setInitialDelay(1000);
+		timer.start();
+	}
+	
+	public void removeFullRows()
+	{
+		int oldRow = rows - 1;
+		int newRow = rows - 1;
+		boolean lineFull = true;
+		int fullRows = 0;
+		
+		while (oldRow >= 0)
+		{
+			for (int c = 0; c < cols; c++)
+			{
+				//check if row is full
+				if (board[oldRow][c] == emptyColor)
+				{
+					lineFull = false;
+				}
+			}
+			
+			if (lineFull)
+			{
+				fullRows++;
+				oldRow--;
+			}
+			else
+			{
+				for (int c = 0; c < cols; c++)
+				{
+					//if row not full, copy oldRow to newRow
+					board[newRow][c] = board[oldRow][c];
+						
+				}
+				newRow--;
+				oldRow--;
+			}
+		lineFull = true;
+		}
+		
+		for (int r = 0; r < fullRows; r++)
+		{
+			for (int c = 0; c < cols; c++)
+			{
+				board[r][c] = emptyColor;
+			}
+		}
+		paintBoard();
+	}
+	
+	public void gameOver()
+	{
+		timer.stop();
+		isGameOver = true;
+		Color p = Color.PINK;
+		Color r = Color.RED;
+		Color o = Color.ORANGE;
+		Color y = Color.YELLOW;
+		Color g = Color.GREEN;
+		Color c = Color.CYAN;
+		Color m = Color.MAGENTA;
+		Color b = Color.BLACK;
+		Color[][] end = {{b,b,r,r,r,b,b,b,y,y},
+						{b,b,r,b,r,b,b,b,y,b},
+						{b,b,r,b,r,o,b,o,y,y},
+						{p,p,r,r,r,o,o,o,y,b},
+						{p,b,r,b,r,o,o,o,y,y},
+						{p,b,p,p,b,o,b,o,b,b},
+						{p,b,b,p,b,o,b,o,b,b},
+						{p,p,p,p,b,b,b,p,p,p},
+						{b,b,c,b,c,b,b,p,b,p},
+						{b,b,c,b,c,b,b,p,p,p},
+						{b,b,c,c,c,m,m,p,p,b},
+						{g,g,g,c,b,m,b,p,b,p},
+						{g,b,g,b,b,m,m,b,b,b},
+						{g,b,g,b,b,m,b,b,b,b},
+						{g,g,g,b,b,m,m,b,b,b}};
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				tiles[i][j].setBackground(end[i][j]);
+			}
+		}
+		System.out.println("press R to restart!");
+	}
+	
+	
+	public void resetGame()
+	{
+		isGameOver = false;
+		timer.restart();
+		setDefaultTileColor(DEFAULT_TILE_COLOR);
+		paintBoard();
+		newFallingPiece();
+	}
+	
+	public void pauseGame()
+	{
+		paused = !paused;
+		if (paused)
+		{	
+			timer.stop();
+			Color p = Color.PINK;
+			Color r = Color.RED;
+			Color o = Color.ORANGE;
+			Color y = Color.YELLOW;
+			Color g = Color.GREEN;
+			Color c = Color.CYAN;
+			Color b = Color.BLACK;
+			Color[][] pauseScreen = 
+					{{b,b,b,b,b,b,b,b,b,b},
+					{b,p,p,p,b,b,r,r,r,b},
+					{b,p,b,p,b,b,r,b,r,b},
+					{b,p,p,p,b,b,r,r,r,b},
+					{b,p,b,b,b,b,r,b,r,b},
+					{b,b,b,b,b,b,b,b,b,b},
+					{b,o,b,o,b,b,y,y,y,b},
+					{b,o,b,o,b,b,y,y,b,b},
+					{b,o,o,o,b,y,y,y,b,b},
+					{b,b,b,b,b,b,b,b,b,b},
+					{b,g,g,g,b,b,c,c,b,b},
+					{b,g,b,b,b,b,c,b,c,b},
+					{b,g,g,g,b,b,c,b,c,b},
+					{b,g,b,b,b,b,c,b,c,b},
+					{b,g,g,g,b,b,c,c,b,b}};
+			for (int i = 0; i < rows; i++)
+			{
+				for (int j = 0; j < cols; j++)
+				{
+					tiles[i][j].setBackground(pauseScreen[i][j]);
+				}
+			}
+		}
+		else 
+		{
+			timer.restart();
+			paintBoard();
+		}
+	}
+	
+
+	
+	public static void main(String[] args)
+	{
+		Tetris3 test = new Tetris3();
+		test.setDefaultTileColor(Color.WHITE);
+		test.setGridBorder(3, 3);
+		test.initializeFramePanelDim(550, 600, 300, 450, 50, 50);
+		test.setBackgroundColor(Color.BLACK);
+		test.setManualBorder(20, 20, 20, 20, Color.BLUE);
+		//frame.pack();
+		test.newFallingPiece();
+		test.paintFallingPiece();
+		test.timerFired();
+	}
+	
+
+}
