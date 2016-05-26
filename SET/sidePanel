@@ -1,0 +1,88 @@
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class sidePanel extends JPanel implements ActionListener {
+	
+	private JLabel hold;
+	public static JPanel holdDisplay;
+	public static JLabel scoreLabel;
+	private JButton menu;
+	private JButton pause;
+
+	public sidePanel()
+	{
+		hold = new JLabel("HOLD (shift)");
+		holdDisplay = new JPanel();
+		scoreLabel = new JLabel("SCORE: 0");
+		menu = new JButton("MENU (m)");
+		pause = new JButton("PAUSE (p)");
+		menu.addActionListener(this);
+		pause.addActionListener(this);
+		menu.setFocusable(false);
+		pause.setFocusable(false);
+		initializeSideDim(20);
+		
+	}
+	
+	public void initializeSideDim(int strut)
+	{
+		this.setPreferredSize(new Dimension(100, 400));
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.setOpaque(true);
+		this.add(Box.createVerticalStrut(strut));
+		this.add(hold);
+		this.add(holdDisplay);
+		this.add(Box.createVerticalStrut(strut));
+		this.add(scoreLabel);
+		this.add(Box.createVerticalStrut(strut));
+		this.add(menu);
+		this.add(Box.createVerticalStrut(strut));
+		this.add(pause);
+		this.add(Box.createVerticalStrut(strut));
+	}
+	
+	public void holdDisplayGrid(int rows, int cols, int gridBorderW, int gridBorderL, Color bg)
+	{
+		 GridLayout grid = new GridLayout(rows, cols, gridBorderW, gridBorderL);
+		  this.setLayout(grid);
+			for (int i = 0; i < rows; i++)
+			{
+				for (int j = 0; j < cols; j++)
+				{
+					/**
+					holdDisplay[i][j] = new JPanel();
+					holdDisplay[i][j].setBackground(bg);
+					holdDisplay[i][j].setOpaque(true);
+					holdDisplay.setSize(new Dimension (10, 10));
+					holdDisplay.setOpaque(true);
+					this.add(holdDisplay[i][j]);
+					**/
+				}
+			}
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getActionCommand().equals("MENU (m)"))
+		{
+			System.out.println("open menu window");
+		}
+		if(e.getActionCommand().equals("PAUSE (p)"))
+		{
+			Tetris.main.pauseGame();
+			System.out.println("paused");
+		}
+	}
+
+}
