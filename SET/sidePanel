@@ -16,14 +16,18 @@ public class sidePanel extends JPanel implements ActionListener {
 	
 	private JLabel hold;
 	public static JPanel holdDisplay;
+	private JPanel[][] holdTiles;
 	public static JLabel scoreLabel;
 	private JButton menu;
 	private JButton pause;
+	private int HDrows = 4;
+	private int HDcols = 6;
 
 	public sidePanel()
 	{
 		hold = new JLabel("HOLD (shift)");
 		holdDisplay = new JPanel();
+		holdTiles = new JPanel[HDrows][HDcols];
 		scoreLabel = new JLabel("SCORE: 0");
 		menu = new JButton("MENU (m)");
 		pause = new JButton("PAUSE (p)");
@@ -42,6 +46,7 @@ public class sidePanel extends JPanel implements ActionListener {
 		this.setOpaque(true);
 		this.add(Box.createVerticalStrut(strut));
 		this.add(hold);
+		holdDisplayGrid(1, 1, Color.BLACK);
 		this.add(holdDisplay);
 		this.add(Box.createVerticalStrut(strut));
 		this.add(scoreLabel);
@@ -52,24 +57,44 @@ public class sidePanel extends JPanel implements ActionListener {
 		this.add(Box.createVerticalStrut(strut));
 	}
 	
-	public void holdDisplayGrid(int rows, int cols, int gridBorderW, int gridBorderL, Color bg)
+	public void holdDisplayGrid(int gridBorderW, int gridBorderL, Color bg)
 	{
-		 GridLayout grid = new GridLayout(rows, cols, gridBorderW, gridBorderL);
-		  this.setLayout(grid);
-			for (int i = 0; i < rows; i++)
+		holdDisplay.setSize(new Dimension (20, 75));
+		GridLayout grid = new GridLayout(HDrows, HDcols, gridBorderW, gridBorderL);
+		holdDisplay.setLayout(grid);
+		for (int i = 0; i < HDrows; i++)
+		{
+			for (int j = 0; j < HDcols; j++)
 			{
-				for (int j = 0; j < cols; j++)
+				holdTiles[i][j] = new JPanel();
+				holdTiles[i][j].setBackground(bg);
+				holdTiles[i][j].setOpaque(true);
+				holdDisplay.add(holdTiles[i][j]);
+			}
+		}
+		holdDisplay.setBackground(Color.BLACK);
+		holdDisplay.setOpaque(true);
+	}
+	
+	public void paintHoldPiece()
+	{
+		for (int r = 0; r < mainPanel.holdPiece.length; r++)
+		{
+			for (int c = 0; c < mainPanel.holdPiece[0].length; c++)
+			{
+				if (mainPanel.holdPiece[r][c])
 				{
-					/**
-					holdDisplay[i][j] = new JPanel();
-					holdDisplay[i][j].setBackground(bg);
-					holdDisplay[i][j].setOpaque(true);
-					holdDisplay.setSize(new Dimension (10, 10));
-					holdDisplay.setOpaque(true);
-					this.add(holdDisplay[i][j]);
-					**/
+					//paint piece starting at (1, 1)
+					paintCell(1 + r, 1 + c, mainPanel.holdPieceColor); 
+			
 				}
 			}
+		}
+	}
+	
+	public void paintCell(int row, int col, Color c)
+	{
+		holdTiles[row][col].setBackground(c);
 	}
 	
 	@Override
@@ -81,7 +106,7 @@ public class sidePanel extends JPanel implements ActionListener {
 		if(e.getActionCommand().equals("PAUSE (p)"))
 		{
 			Tetris.main.pauseGame();
-			System.out.println("paused");
+			//System.out.println("paused");
 		}
 	}
 
