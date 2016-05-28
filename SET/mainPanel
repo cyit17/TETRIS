@@ -33,9 +33,10 @@ public class mainPanel extends JPanel implements KeyListener, ActionListener {
 	private int timerDelay;
 	private boolean isGameOver = false;
 	private boolean paused = false;
-	private boolean[][] holdPiece = null;
-	private Color holdPieceColor;
+	public static boolean[][] holdPiece = null;
+	public static Color holdPieceColor;
 	public static int score;
+	private boolean hasShifted = false;
 	
 	//Seven "standard" pieces (tetrominoes)
 	  private static final boolean[][] I_PIECE = {
@@ -103,7 +104,6 @@ public class mainPanel extends JPanel implements KeyListener, ActionListener {
 	  {
 		  this.setPreferredSize(new Dimension(panelW, panelL));
 		  this.setOpaque(false);
-		  
 		  GridLayout grid = new GridLayout(rows, cols, gridBorderW, gridBorderL);
 		  this.setLayout(grid);
 			for (int i = 0; i < rows; i++)
@@ -302,46 +302,39 @@ public class mainPanel extends JPanel implements KeyListener, ActionListener {
 		
 		public void holdFallingPiece()
 		{
-			
-			//if holdPiece is  null
-			// (first time holding)
-			//1. store fallingPiece in heldPiece
-			//2. paint over prev piece
-			//2. create new falling Piece
-			//else
-			//1. swap held Piece with fallingPiece
-			//2. get corresponding color
-			//3. color over prev piece
-			//r. create new falling piece (with heldPiece shape and color)
-			
-			if (holdPiece == null) // first hold
-			{	
-				holdPiece = fallingPiece;
-				holdPieceColor = fallingPieceColor;
-				//System.out.println("held piece shape: " + fallingPiece);
-				//System.out.println("held piece color: " + fallingPieceColor);
-				fallingPieceColor = emptyColor;
-				paintFallingPiece();
-				newFallingPiece();
-			}
-			else //holdPiece holds a fallingPiece, swap
-			{
-				boolean[][] tempP = holdPiece;
-				Color tempC = holdPieceColor;
-				holdPiece = fallingPiece;
-				holdPieceColor = fallingPieceColor;
-				
-				fallingPieceColor = emptyColor;
-				paintFallingPiece();
-				newFallingPiece();
+			if (!hasShifted) {
+				if (holdPiece == null) // first hold
+				{	
+					holdPiece = fallingPiece;
+					holdPieceColor = fallingPieceColor;
+					//System.out.println("held piece shape: " + fallingPiece);
+					//System.out.println("held piece color: " + fallingPieceColor);
+					fallingPieceColor = emptyColor;
+					paintFallingPiece();
+					newFallingPiece();
+					hasShifted = true;
+				}
+				else //holdPiece holds a fallingPiece, swap
+				{
+					boolean[][] tempP = holdPiece;
+					Color tempC = holdPieceColor;
+					holdPiece = fallingPiece;
+					holdPieceColor = fallingPieceColor;
+					
+					fallingPieceColor = emptyColor;
+					paintFallingPiece();
+					newFallingPiece();
 
-				fallingPiece = tempP;
-				fallingPieceColor = tempC;
-				//System.out.println("falling piece shape: " + fallingPiece);
-				//System.out.println("falling piece color: " + fallingPieceColor);
-				paintFallingPiece();
-				
+					fallingPiece = tempP;
+					fallingPieceColor = tempC;
+					//System.out.println("falling piece shape: " + fallingPiece);
+					//System.out.println("falling piece color: " + fallingPieceColor);
+					paintFallingPiece();
+					hasShifted = true;
+					
+				}
 			}
+			
 			
 		}
 		 
@@ -413,6 +406,7 @@ public class mainPanel extends JPanel implements KeyListener, ActionListener {
 				removeFullRows();
 				paintBoard();
 				newFallingPiece();
+				hasShifted = false;
 				if (fallingPieceRow == 0 && !fallingPieceIsLegal(fallingPieceRow, fallingPieceCol))
 				{	
 					timer.setDelay(1000);
