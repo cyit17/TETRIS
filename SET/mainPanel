@@ -341,7 +341,7 @@ public class mainPanel extends JPanel implements KeyListener, ActionListener {
 		//must override KeyListener interface 
 		public void keyPressed(KeyEvent e)
 		{
-			if (isGameOver == false)
+			if (!isGameOver && !paused)
 			{
 				if (e.getKeyCode() == KeyEvent.VK_LEFT)
 					moveFallingPiece(0, -1);
@@ -366,16 +366,18 @@ public class mainPanel extends JPanel implements KeyListener, ActionListener {
 					holdFallingPiece();
 				}
 				
-				//press p to pause, key code 80
-				if (e.getKeyCode() == 80)
-				{
-					pauseGame();
-				}
 			}
+			
 			if (e.getKeyCode() == KeyEvent.VK_R)
 			{
 				timer.stop();
 				resetGame();	
+			}
+			
+			//press p to pause, key code 80
+			if (e.getKeyCode() == 80)
+			{
+				pauseGame();
 			}
 			
 		}	
