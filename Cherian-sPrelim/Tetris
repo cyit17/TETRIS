@@ -1,0 +1,116 @@
+package tetris;
+
+import javax.swing.*;
+
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.ComponentOrientation;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.BorderLayout; 
+import java.util.Random;
+
+import javax.swing.*;
+
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.ComponentOrientation;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.BorderLayout; 
+import java.util.Random;
+
+public class Tetris extends JPanel 
+{
+	//added serial # to remove error, lightbulb over class declaration line?
+	private static final long serialVersionUID = -3006798671524080331L;
+	
+	public JFrame frame;
+	public static mainPanel main;
+	public sidePanel side;
+
+	
+	public Tetris()
+	{
+		setOpaque(true);
+		this.initializeFrameDim(550, 600, 50, 50);
+		this.setBackgroundColor(Color.BLACK);
+	}
+	
+	public Tetris(int w, int l, int h, int v, Color c) 
+	{
+		setOpaque(true);
+		this.initializeFrameDim(w, l, h, v);
+		this.setBackgroundColor(c);
+	}
+	
+	public void initializeFrameDim(int frameW, int frameL, int hgap, int vgap)
+	{
+		frame = new JFrame("TETRIS");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(frameW, frameL);
+		
+		main = new mainPanel();
+		main.setDefaultTileColor(Color.WHITE);
+		main.setGridBorder(3, 3);
+		main.initializePanelDim(300, 450);
+		main.setManualBorder(20, 20, 20, 20, Color.BLUE);
+		//frame.pack();
+		
+		Container contentPane = frame.getContentPane();
+		frame.setContentPane(contentPane);
+		contentPane.setLayout(new FlowLayout(FlowLayout.LEFT, hgap, vgap));
+		
+		frame.add(main);
+		frame.addKeyListener((KeyListener) main);
+		
+		side = new sidePanel();
+		frame.add(side);
+		//position frame in center of screen when it runs
+		frame.setLocationRelativeTo(null);
+		frame.setResizable(false);
+		frame.setVisible(true);
+		frame.requestFocusInWindow();
+	}
+	
+	public void initializeGame()
+	{
+		main.newFallingPiece();
+		main.paintFallingPiece();
+		main.timerFired();
+	}
+	
+	public void setBackgroundColor(Color c)
+	{
+		//get component that represents contents of graphic user interface,
+		//layer that is used to hold objects = content pane (JPanel panel)
+		frame.getContentPane().setBackground(c);	
+	}
+	
+	
+
+	
+	public static void main(String[] args)
+	{
+		Tetris t = new Tetris();
+		t.initializeGame();
+	}
+	
+	
+}
