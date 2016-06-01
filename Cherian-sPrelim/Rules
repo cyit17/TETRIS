@@ -1,0 +1,82 @@
+package tetris;
+
+import javax.swing.*;
+
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.ComponentOrientation;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.BorderLayout; 
+import java.util.Random;
+
+import javax.swing.*;
+
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.ComponentOrientation;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.BorderLayout; 
+import java.util.Random;
+
+public class Rules{
+	
+	public JFrame rulesFrame;
+	public static mainPanel mainFrame;
+	public JTextField rulesContent = new JTextField();
+	
+	public Rules()
+	{
+		this.initializeFrameDim(550, 600, 50, 50);
+		setRules();
+	}
+	
+	public Rules(int w, int l, int h, int v, Color c) 
+	{
+		this.initializeFrameDim(w, l, h, v);
+	}
+	
+	public void initializeFrameDim(int frameW, int frameL, int hgap, int vgap)
+	{
+		rulesFrame = new JFrame("RULES");
+		rulesFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		rulesFrame.setSize(frameW, frameL);
+		
+		mainFrame = new mainPanel();
+		mainFrame.add(rulesContent);
+		Container contentPane = rulesFrame.getContentPane();
+		rulesFrame.setContentPane(contentPane);
+		contentPane.setLayout(new FlowLayout(FlowLayout.LEFT, hgap, vgap));
+		
+		//position rulesFrame in center of screen when it runs
+		rulesFrame.setLocationRelativeTo(null);
+		rulesFrame.setResizable(false);
+		rulesFrame.setVisible(true);
+		rulesFrame.requestFocusInWindow();
+	}
+	
+	public void setRules()
+	{
+		rulesContent.setText("Rules: They're important to play this game.");
+		rulesContent.setEditable(false);
+		rulesContent.setVisible(true);
+	}
+}
+
