@@ -40,29 +40,23 @@ public class Rules{
 	
 	public JFrame rulesFrame;
 	public static mainPanel mainFrame;
-	public JTextField rulesContent = new JTextField();
+	public JTextArea rulesContent = new JTextArea();
 	
 	public Rules()
 	{
-		this.initializeFrameDim(550, 600, 50, 50);
+		this.initializeFrameDim(550, 200, 50, 50);
 		setRules();
-	}
-	
-	public Rules(int w, int l, int h, int v, Color c) 
-	{
-		this.initializeFrameDim(w, l, h, v);
 	}
 	
 	public void initializeFrameDim(int frameW, int frameL, int hgap, int vgap)
 	{
 		rulesFrame = new JFrame("RULES");
-		rulesFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		rulesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		rulesFrame.setSize(frameW, frameL);
 		
 		mainFrame = new mainPanel();
-		mainFrame.add(rulesContent);
 		Container contentPane = rulesFrame.getContentPane();
-		rulesFrame.setContentPane(contentPane);
+		rulesFrame.setContentPane(rulesContent);
 		contentPane.setLayout(new FlowLayout(FlowLayout.LEFT, hgap, vgap));
 		
 		//position rulesFrame in center of screen when it runs
@@ -74,7 +68,8 @@ public class Rules{
 	
 	public void setRules()
 	{
-		rulesContent.setText("Rules: They're important to play this game.");
+		rulesContent.setText(" Rules: \n Rotate the pieces using the arrow keys. Fill up every space in a row to clear it. Everytime you clear\n a line your score goes up by one point. In addition to the arrow keys, the shift key is used to store\n the current tetrad that you are maneuvering. Pressing the shift key again will switch the tetrad you\n had stored with the one that you're maneuvering. Be warned, you can only shift once per piece.\n Press P to pause the game, R to restart the game, and M to show the rules.\n\n Press M to resume the game\n\n HAVE FUN!!! :D");
+		
 		rulesContent.setEditable(false);
 		rulesContent.setVisible(true);
 	}
